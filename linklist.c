@@ -9,30 +9,32 @@ struct Node {
 
 // Function to traverse the linked list and print its elements
 void linkedListTraversal(struct Node *ptr) {
-    while (ptr != NULL) { // Loop until the end of the list
+    while (ptr != NULL) { // Use NULL instead of null
         printf("Element: %d\n", ptr->data);
-        ptr = ptr->next; // Move to the next node
+        ptr = ptr->next; // Move to next node
     }
 }
 
 // Case 1: Deleting the first node in the linked list
 struct Node *deleteFirst(struct Node *head) {
-    struct Node *ptr = head;   // Temporary pointer to the current head
-    head = head->next;         // Move the head to the next node
-    free(ptr);                 // Free the memory of the old head
-    return head;               // Return the new head of the list
+    struct Node *ptr = head; // Temporary pointer to the current head
+    head = head->next;       // Move the head to the next node
+    free(ptr);               // Free the memory of the old head
+    return head;             // Return the new head of the list
 }
 
 // Case 2: Deleting a node at a specific index
 struct Node *deleteAtIndex(struct Node *head, int index) {
-    struct Node *p = head;      // Pointer to traverse the list
-    struct Node *q = head->next; // Pointer to the next node
-    for (int i = 0; i < index - 1; i++) {
-        p = p->next; // Move `p` to the desired position
-        q = q->next; // Move `q` one step ahead of `p`
+    struct Node *p = head;        // Pointer to traverse the list
+    struct Node *q = head->next;  // Pointer to the next node
+    for (int i = 0; i < index - 1 && q != NULL; i++) { // Added boundary condition for safety
+        p = p->next; // Move p to the desired position
+        q = q->next; // Move q one step ahead of p
     }
-    p->next = q->next; // Skip the node to be deleted
-    free(q);           // Free the memory of the deleted node
+    if (q != NULL) {
+        p->next = q->next;
+        free(q);
+    }
     return head;
 }
 
@@ -40,54 +42,58 @@ struct Node *deleteAtIndex(struct Node *head, int index) {
 struct Node *deleteAtLast(struct Node *head) {
     struct Node *p = head;      // Pointer to traverse the list
     struct Node *q = head->next; // Pointer to the next node
-    while (q->next != NULL) {   // Stop at the second last node
-        p = p->next; // Move `p` to the next node
-        q = q->next; // Move `q` to the next node
+    while (q->next != NULL) {   // Corrected syntax (!= instead of !)
+        p = p->next; // Move p to the next node
+        q = q->next; // Move q to the next node
     }
-    p->next = NULL;  // Disconnect the last node
-    free(q);         // Free the memory of the last node
+    p->next = NULL;
+    free(q);
     return head;
 }
 
 // Case 4: Deleting a node with a given value
 struct Node *deleteByValue(struct Node *head, int value) {
-    struct Node *p = head;      // Pointer to traverse the list
-    struct Node *q = head->next; // Pointer to the next node
-    while (q->data != value && q->next != NULL) { // Traverse until the value is found
-        p = p->next; // Move `p` to the next node
-        q = q->next; // Move `q` to the next node
+    struct Node *p = head;
+    struct Node *q = head->next;
+    while (q != NULL && q->data != value) { // Added NULL check before accessing q->data
+        p = p->next;
+        q = q->next;
     }
-    if (q->data == value) {    // If the value is found
-        p->next = q->next;     // Skip the node with the value
-        free(q);               // Free the memory of the deleted node
+    if (q != NULL && q->data == value) { // If the value is found
+        p->next = q->next;
+        free(q);
     }
     return head;
 }
 
 int main() {
-    // Creating nodes for the linked list
     struct Node *head, *second, *third, *fourth;
-    head = (struct Node *)malloc(sizeof(struct Node));   // Allocate memory for the first node
-    second = (struct Node *)malloc(sizeof(struct Node)); // Allocate memory for the second node
-    third = (struct Node *)malloc(sizeof(struct Node));  // Allocate memory for the third node
-    fourth = (struct Node *)malloc(sizeof(struct Node)); // Allocate memory for the fourth node
+
+    // Allocate memory for nodes
+    head = (struct Node *)malloc(sizeof(struct Node));
+    second = (struct Node *)malloc(sizeof(struct Node));
+    third = (struct Node *)malloc(sizeof(struct Node));
+    fourth = (struct Node *)malloc(sizeof(struct Node));
 
     // Linking nodes and assigning data
-    head->data = 4;    head->next = second;
-    second->data = 3;  second->next = third;
-    third->data = 8;   third->next = fourth;
-    fourth->data = 1;  fourth->next = NULL;
+    head->data = 4;
+    head->next = second;
 
-    printf("Linked list before deletion\n");
+    second->data = 3;
+    second->next = third;
+
+    third->data = 8;
+    third->next = fourth;
+
+    fourth->data = 1;
+    fourth->next = NULL;
+
+    printf("Linked list before deletion:\n");
     linkedListTraversal(head);
 
-    // Uncomment one of the following to test deletion cases:
-    // head = deleteFirst(head);               // Delete the first node
-    // head = deleteAtIndex(head, 2);          // Delete the node at index 2
-    head = deleteAtLast(head);               // Delete the last node
-    // head = deleteByValue(head, 8);          // Delete the node with value 8
+    head = deleteAtLast(head); // Delete the last node
 
-    printf("Linked list after deletion\n");
+    printf("Linked list after deletion:\n");
     linkedListTraversal(head);
 
     return 0;
